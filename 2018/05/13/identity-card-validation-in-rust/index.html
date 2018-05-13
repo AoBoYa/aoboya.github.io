@@ -99,24 +99,27 @@
 
 
 
-  <meta name="description" content="读书笔记，范围从深奥数理到博大文史再到雅美艺术。">
-<meta name="keywords" content="读书笔记,aoboya,奥理,博文,艺雅">
-<meta property="og:type" content="website">
-<meta property="og:title" content="奥博雅汇">
-<meta property="og:url" content="https://aoboya.cc/archives/2018/04/index.html">
+  <meta name="description" content="对 douyasi/identity-card Rust 的语言实现版本。  传送门https://github.com/ycrao/idrs 编译运行12345678git clone https://github.com/ycrao/idrscd idrscp .env.example .env vim .env // 修改配置中 SQLITE_DB_PATH 值，执行项目数据库文件（请">
+<meta name="keywords" content="identity-card">
+<meta property="og:type" content="article">
+<meta property="og:title" content="身份证校验及其属地查询Rust版">
+<meta property="og:url" content="https://aoboya.cc/2018/05/13/identity-card-validation-in-rust/index.html">
 <meta property="og:site_name" content="奥博雅汇">
-<meta property="og:description" content="读书笔记，范围从深奥数理到博大文史再到雅美艺术。">
+<meta property="og:description" content="对 douyasi/identity-card Rust 的语言实现版本。  传送门https://github.com/ycrao/idrs 编译运行12345678git clone https://github.com/ycrao/idrscd idrscp .env.example .env vim .env // 修改配置中 SQLITE_DB_PATH 值，执行项目数据库文件（请">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://s1.aoboya.cc/2018/05/13/644f7b67a90c683d7d7bd8080d740ba2.jpg">
+<meta property="og:updated_time" content="2018-05-13T07:10:47.529Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="奥博雅汇">
-<meta name="twitter:description" content="读书笔记，范围从深奥数理到博大文史再到雅美艺术。">
+<meta name="twitter:title" content="身份证校验及其属地查询Rust版">
+<meta name="twitter:description" content="对 douyasi/identity-card Rust 的语言实现版本。  传送门https://github.com/ycrao/idrs 编译运行12345678git clone https://github.com/ycrao/idrscd idrscp .env.example .env vim .env // 修改配置中 SQLITE_DB_PATH 值，执行项目数据库文件（请">
+<meta name="twitter:image" content="https://s1.aoboya.cc/2018/05/13/644f7b67a90c683d7d7bd8080d740ba2.jpg">
 
 
 
 
 
 
-  <link rel="canonical" href="https://aoboya.cc/archives/2018/04/"/>
+  <link rel="canonical" href="https://aoboya.cc/2018/05/13/identity-card-validation-in-rust/"/>
 
 
 
@@ -126,7 +129,7 @@
   };
 </script>
 
-  <title>归档 | 奥博雅汇</title>
+  <title>身份证校验及其属地查询Rust版 | 奥博雅汇</title>
   
 
 
@@ -173,7 +176,7 @@
     
   
 
-  <div class="container sidebar-position-left page-archive">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -273,140 +276,219 @@
           
             
 
-    
-    
-      
-      
-    
-      
-      
-    
-      
-      
-    
-      
-      
-    
-    
-
-  
-
-
           
           <div id="content" class="content">
             
 
+  <div id="posts" class="posts-expand">
+    
+
+  
+
   
   
   
-  <div class="post-block archive">
-    <div id="posts" class="posts-collapse">
-      <span class="archive-move-on"></span>
 
-      
-      <span class="archive-page-counter">
-        
-        
-        
-          
-        
-        嗯..! 目前共计 3 篇日志。 继续努力。
-      </span>
-      
-
-      
-
-        
-        
-        
-
-        
-          
-          <div class="collection-title">
-            <h1 class="archive-year" id="archive-year-2018">2018</h1>
-          </div>
-        
-        
-
-        
+  
 
   <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://aoboya.cc/2018/05/13/identity-card-validation-in-rust/">
 
-      <h2 class="post-title">
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="aoboya">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="奥博雅汇">
+    </span>
+
+    
+      <header class="post-header">
+
         
-            <a class="post-title-link" href="/2018/04/21/ipad-app-intro-nebo/" itemprop="url">
-              
-                <span itemprop="name">iPad 笔记效率软件推荐 - Nebo</span>
-              
-            </a>
         
-      </h2>
+          <h1 class="post-title" itemprop="name headline">身份证校验及其属地查询Rust版</h1>
+        
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-04-21T22:40:54+08:00"
-              content="2018-04-21" >
-          04-21
-        </time>
-      </div>
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-13T15:07:32+08:00">2018-05-13</time>
+            
 
-    </header>
-  </article>
+            
+            
 
+            
+          </span>
 
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Rust/" itemprop="url" rel="index"><span itemprop="name">Rust</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2018/04/14/hello-world/" itemprop="url">
-              
-                <span itemprop="name">Hello World</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-04-14T16:00:00+08:00"
-              content="2018-04-14" >
-          04-14
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
       
 
+      
+        <blockquote>
+<p>  对 <a href="https://github.com/douyasi/identity-card" target="_blank" rel="noopener">douyasi/identity-card</a> Rust 的语言实现版本。</p>
+</blockquote>
+<h3 id="传送门"><a href="#传送门" class="headerlink" title="传送门"></a>传送门</h3><p><a href="https://github.com/ycrao/idrs" target="_blank" rel="noopener">https://github.com/ycrao/idrs</a></p>
+<h3 id="编译运行"><a href="#编译运行" class="headerlink" title="编译运行"></a>编译运行</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/ycrao/idrs</span><br><span class="line">cd idrs</span><br><span class="line">cp .env.example .env </span><br><span class="line">vim .env </span><br><span class="line">// 修改配置中 SQLITE_DB_PATH 值，执行项目数据库文件（请使用绝对路径）</span><br><span class="line">// modify SQLITE_DB_PATH value pointed to your `project/db/id.sqlite` file (using absolute path)</span><br><span class="line">cargo build</span><br><span class="line">cargo run</span><br></pre></td></tr></table></figure>
+<h3 id="结果示例"><a href="#结果示例" class="headerlink" title="结果示例"></a>结果示例</h3><p><img src="https://s1.aoboya.cc/2018/05/13/644f7b67a90c683d7d7bd8080d740ba2.jpg" alt=""></p>
+<h3 id="其它实现版本"><a href="#其它实现版本" class="headerlink" title="其它实现版本"></a>其它实现版本</h3><ul>
+<li>PHP实现版本 <a href="https://github.com/douyasi/identity-card" target="_blank" rel="noopener">douyasi/identity-card</a></li>
+<li>Node/Javascript实现版本 <a href="https://github.com/ycrao/id.js" target="_blank" rel="noopener">id.js</a></li>
+</ul>
+
+      
     </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>坚持原创分享，您的支持将鼓励我继续创作！</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatpay.jpg" alt="aoboya 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="aoboya 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/identity-card/" rel="tag"># identity-card</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/21/ipad-app-intro-nebo/" rel="next" title="iPad 笔记效率软件推荐 - Nebo">
+                <i class="fa fa-chevron-left"></i> iPad 笔记效率软件推荐 - Nebo
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </div>
   
   
   
+  </article>
 
-  
 
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
           
+
+  
+
+
 
         </div>
         
@@ -427,8 +509,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -524,6 +615,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#传送门"><span class="nav-number">1.</span> <span class="nav-text">传送门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编译运行"><span class="nav-number">2.</span> <span class="nav-text">编译运行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#结果示例"><span class="nav-number">3.</span> <span class="nav-text">结果示例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其它实现版本"><span class="nav-number">4.</span> <span class="nav-text">其它实现版本</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -658,6 +765,10 @@
 
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.1.0"></script>
+
+
 
   
 
