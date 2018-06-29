@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.1.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.1.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.1.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.1.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Beanstalk 是一个高性能、轻量级的分布式内存队列系统，最初设计的目的是想通过后台异步执行耗时的任务来降低高容量Web应用系统的页面访问延迟。  安装与配置beanstalkd安装从官网下载最新版的源码，当前最新版为 1.10。参考下面命令，编译安装。 12345wget https://github.com/kr/beanstalkd/archive/v1.10.tar.gztar">
+<meta name="keywords" content="beanstalkd,laravel,supervisord,queue">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Laravel在CentOS服务器环境下使用beanstalkd队列服务">
+<meta property="og:url" content="https://aoboya.cc/2018/06/29/laravel-using-beanstalkd-queue-on-centos/index.html">
+<meta property="og:site_name" content="奥博雅汇">
+<meta property="og:description" content="Beanstalk 是一个高性能、轻量级的分布式内存队列系统，最初设计的目的是想通过后台异步执行耗时的任务来降低高容量Web应用系统的页面访问延迟。  安装与配置beanstalkd安装从官网下载最新版的源码，当前最新版为 1.10。参考下面命令，编译安装。 12345wget https://github.com/kr/beanstalkd/archive/v1.10.tar.gztar">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-06-29T03:39:17.645Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Laravel在CentOS服务器环境下使用beanstalkd队列服务">
+<meta name="twitter:description" content="Beanstalk 是一个高性能、轻量级的分布式内存队列系统，最初设计的目的是想通过后台异步执行耗时的任务来降低高容量Web应用系统的页面访问延迟。  安装与配置beanstalkd安装从官网下载最新版的源码，当前最新版为 1.10。参考下面命令，编译安装。 12345wget https://github.com/kr/beanstalkd/archive/v1.10.tar.gztar">
+
+
+
+
+
+
+  <link rel="canonical" href="https://aoboya.cc/2018/06/29/laravel-using-beanstalkd-queue-on-centos/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Laravel在CentOS服务器环境下使用beanstalkd队列服务 | 奥博雅汇</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> 
+
+<div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">奥博雅汇</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">AoBoYa [aʊ bɔ: jɑː]</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+          
+  <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分类</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+</li>
+
+      
+
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://aoboya.cc/2018/06/29/laravel-using-beanstalkd-queue-on-centos/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="aoboya">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="奥博雅汇">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Laravel在CentOS服务器环境下使用beanstalkd队列服务</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-29T11:36:44+08:00">2018-06-29</time>
+            
+
+            
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>  <code>Beanstalk</code> 是一个高性能、轻量级的分布式内存队列系统，最初设计的目的是想通过后台异步执行耗时的任务来降低高容量Web应用系统的页面访问延迟。</p>
+</blockquote>
+<h3 id="安装与配置beanstalkd"><a href="#安装与配置beanstalkd" class="headerlink" title="安装与配置beanstalkd"></a>安装与配置beanstalkd</h3><h4 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h4><p>从<a href="http://kr.github.io/beanstalkd/download.html" target="_blank" rel="noopener">官网</a>下载最新版的源码，当前最新版为 <code>1.10</code>。参考下面命令，编译安装。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">wget https://github.com/kr/beanstalkd/archive/v1.10.tar.gz</span><br><span class="line">tar zxvf v1.10.tar.gz</span><br><span class="line"><span class="built_in">cd</span> beanstalkd-1.10</span><br><span class="line">make</span><br><span class="line">mv beanstalkd /usr/<span class="built_in">local</span>/bin/</span><br></pre></td></tr></table></figure>
+<p>上面将 <code>beanstalkd</code> 可执行程序放置在 <code>/usr/local/bin/</code> 目录下。</p>
+<h4 id="启动脚本"><a href="#启动脚本" class="headerlink" title="启动脚本"></a>启动脚本</h4><p>下面使用 <code>systemctl</code> 来配置启动脚本。</p>
+<!--
+参考：
+[beanstalkd.sh](https://gist.github.com/cuixin/16dadd3b41807e31b6d1)
+-->
+<p>创建 <code>/lib/systemd/system/beanstalkd.service</code> 文件，写入以下内容（注意相关路径和配置参数）：</p>
+<a id="more"></a>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">[Unit]</span><br><span class="line">Description=Beanstalkd</span><br><span class="line"></span><br><span class="line">[Service]</span><br><span class="line">User=root</span><br><span class="line">ExecStart=/usr/local/bin/beanstalkd -l 127.0.0.1  </span><br><span class="line"></span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line">``` </span><br><span class="line"></span><br><span class="line">然后执行下面命令启用 `beanstalkd` 服务和查看它的进程。</span><br><span class="line"></span><br><span class="line">```bash</span><br><span class="line">systemctl enable beanstalkd</span><br><span class="line">systemctl start beanstalkd</span><br><span class="line">ps ax | grep beanstalkd</span><br></pre></td></tr></table></figure>
+<h3 id="安装beanstalkd-console"><a href="#安装beanstalkd-console" class="headerlink" title="安装beanstalkd console"></a>安装beanstalkd console</h3><p><code>beanstalkd console</code> 是使用 <code>php</code> 语言编写的 <code>beanstalkd</code> 队列控制台程序。</p>
+<p>从官网下载 <code>beanstalk_console</code> <a href="https://github.com/ptrofimov/beanstalk_console" target="_blank" rel="noopener">安装包</a> ，下载完解压之后，部署个域名，注意 <code>nginx</code> 绑定的 <code>root</code> 的为 <code>beanstalk_console</code> 的 <code>public</code> 目录，然后修改 <code>config.php</code> 配置，为了安全起见建议启用 <code>Basic Authentication</code> 认证。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line">$GLOBALS[<span class="string">'config'</span>] = <span class="keyword">array</span>(</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * List of servers available for all users</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="string">'servers'</span> =&gt; <span class="keyword">array</span>(<span class="string">'Local Beanstalkd'</span> =&gt; <span class="string">'beanstalk://localhost:11300'</span>),  <span class="comment">// 启用本地server</span></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Saved samples jobs are kept in this file, must be writable</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="string">'storage'</span> =&gt; dirname(<span class="keyword">__FILE__</span>) . DIRECTORY_SEPARATOR . <span class="string">'storage.json'</span>,</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Optional Basic Authentication</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="string">'auth'</span> =&gt; <span class="keyword">array</span>(</span><br><span class="line">        <span class="string">'enabled'</span> =&gt; <span class="keyword">true</span>,  <span class="comment">// 修改为true开启</span></span><br><span class="line">        <span class="string">'username'</span> =&gt; <span class="string">'admin'</span>,  <span class="comment">// 用户名修改成自己的id名或者服务名</span></span><br><span class="line">        <span class="string">'password'</span> =&gt; <span class="string">'password'</span>,  <span class="comment">// 密码修改成强类型的密码，并牢记</span></span><br><span class="line">    ),</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Version number</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="string">'version'</span> =&gt; <span class="string">'1.7.10'</span>,</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<h3 id="安装与配置supervisord"><a href="#安装与配置supervisord" class="headerlink" title="安装与配置supervisord"></a>安装与配置supervisord</h3><h4 id="安装与基本配置"><a href="#安装与基本配置" class="headerlink" title="安装与基本配置"></a>安装与基本配置</h4><p>为了更好地管理 <code>Laravel</code> 相关队列服务进程，推荐使用 <code>supervisord</code> 工具，安装与配置方法如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">yum -y install python-setuptools</span><br><span class="line">easy_install supervisor</span><br><span class="line">mkdir /etc/supervisor/</span><br><span class="line">mkdir /etc/supervisor/conf.d</span><br><span class="line">echo_supervisord_conf &gt; /etc/supervisor/supervisord.conf</span><br></pre></td></tr></table></figure>
+<p><code>supervisor</code> 的配置文件放置在 <code>/etc/supervisor/supervisord.conf</code> 中。编辑它，在最后面修改添加上：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[include]</span><br><span class="line">files = /etc/supervisor/conf.d/*.conf</span><br></pre></td></tr></table></figure>
+<p>以后，<code>supervisor</code> 管理的服务进程脚本可以放在 <code>/etc/supervisor/conf.d/</code> 目录下，以 <code>.conf</code> 后缀名的文件中。</p>
+<h4 id="启动与服务脚本"><a href="#启动与服务脚本" class="headerlink" title="启动与服务脚本"></a>启动与服务脚本</h4><p>创建 <code>/lib/systemd/system/supervisor.service</code> 文件，写入以下内容：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">[Unit]</span><br><span class="line">Description=Supervisor daemon</span><br><span class="line">After=network.target</span><br><span class="line"></span><br><span class="line">[Service]</span><br><span class="line">Type=forking</span><br><span class="line">ExecStart=/usr/bin/supervisord -c /etc/supervisor/supervisord.conf</span><br><span class="line">ExecStop=/usr/bin/supervisorctl $OPTIONS shutdown</span><br><span class="line">ExecReload=/usr/bin/supervisorctl $OPTIONS reload</span><br><span class="line">KillMode=process</span><br><span class="line">Restart=on-failure</span><br><span class="line">RestartSec=42s</span><br><span class="line"></span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br></pre></td></tr></table></figure>
+<p>然后执行下面命令设置自动开机启动。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">systemctl <span class="built_in">enable</span> supervisor.service</span><br><span class="line">systemctl daemon-reload</span><br><span class="line">chmod 766 supervisor.service</span><br></pre></td></tr></table></figure>
+<p>创建 <code>/etc/init.d/supervisor</code> 脚本，写入以下内容。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># supervisord   This scripts turns supervisord on</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># Author:       Mike McGrath &lt;mmcgrath@redhat.com&gt; (based off yumupdatesd)</span></span><br><span class="line"><span class="comment">#               Jason Koppe &lt;jkoppe@indeed.com&gt; adjusted to read sysconfig,</span></span><br><span class="line"><span class="comment">#                   use supervisord tools to start/stop, conditionally wait</span></span><br><span class="line"><span class="comment">#                   for child processes to shutdown, and startup later</span></span><br><span class="line"><span class="comment">#               Mikhail Mingalev &lt;mingalevme@gmail.com&gt; Merged</span></span><br><span class="line"><span class="comment">#                   redhat-init-jkoppe and redhat-sysconfig-jkoppe, and</span></span><br><span class="line"><span class="comment">#                   made the script "simple customizable".</span></span><br><span class="line"><span class="comment">#               Brendan Maguire &lt;maguire.brendan@gmail.com&gt; Added OPTIONS to</span></span><br><span class="line"><span class="comment">#                   SUPERVISORCTL status call</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># chkconfig:    345 83 04</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># description:  supervisor is a process control utility.  It has a web based</span></span><br><span class="line"><span class="comment">#               xmlrpc interface as well as a few other nifty features.</span></span><br><span class="line"><span class="comment">#               Script was originally written by Jason Koppe &lt;jkoppe@indeed.com&gt;.</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># source function library</span></span><br><span class="line">. /etc/rc.d/init.d/<span class="built_in">functions</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">set</span> -a</span><br><span class="line"></span><br><span class="line">PREFIX=/usr</span><br><span class="line"></span><br><span class="line">SUPERVISORD=<span class="variable">$PREFIX</span>/bin/supervisord</span><br><span class="line">SUPERVISORCTL=<span class="variable">$PREFIX</span>/bin/supervisorctl</span><br><span class="line"></span><br><span class="line">PIDFILE=/tmp/supervisord.pid</span><br><span class="line">LOCKFILE=/var/lock/subsys/supervisord</span><br><span class="line"></span><br><span class="line">OPTIONS=<span class="string">"-c /etc/supervisor/supervisord.conf"</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># unset this variable if you don't care to wait for child processes to shutdown before removing the $LOCKFILE-lock</span></span><br><span class="line">WAIT_FOR_SUBPROCESSES=yes</span><br><span class="line"></span><br><span class="line"><span class="comment"># remove this if you manage number of open files in some other fashion</span></span><br><span class="line"><span class="built_in">ulimit</span> -n 96000</span><br><span class="line"></span><br><span class="line">RETVAL=0</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">running_pid()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment"># Check if a given process pid's cmdline matches a given name</span></span><br><span class="line">    pid=<span class="variable">$1</span></span><br><span class="line">    name=<span class="variable">$2</span></span><br><span class="line">    [ -z <span class="string">"<span class="variable">$pid</span>"</span> ] &amp;&amp; <span class="built_in">return</span> 1</span><br><span class="line">    [ ! -d /proc/<span class="variable">$pid</span> ] &amp;&amp; <span class="built_in">return</span> 1</span><br><span class="line">    (cat /proc/<span class="variable">$pid</span>/cmdline | tr <span class="string">"\000"</span> <span class="string">"\n"</span>|grep -q <span class="variable">$name</span>) || <span class="built_in">return</span> 1</span><br><span class="line">    <span class="built_in">return</span> 0</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">running()</span><br><span class="line">&#123;</span><br><span class="line"><span class="comment"># Check if the process is running looking at /proc</span></span><br><span class="line"><span class="comment"># (works for all users)</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># No pidfile, probably no daemon present</span></span><br><span class="line">    [ ! -f <span class="string">"<span class="variable">$PIDFILE</span>"</span> ] &amp;&amp; <span class="built_in">return</span> 1</span><br><span class="line">    <span class="comment"># Obtain the pid and check it against the binary name</span></span><br><span class="line">    pid=`cat <span class="variable">$PIDFILE</span>`</span><br><span class="line">    running_pid <span class="variable">$pid</span> <span class="variable">$SUPERVISORD</span> || <span class="built_in">return</span> 1</span><br><span class="line">    <span class="built_in">return</span> 0</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="title">start</span></span>() &#123;</span><br><span class="line">        <span class="built_in">echo</span> <span class="string">"Starting supervisord: "</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> [ -e <span class="variable">$PIDFILE</span> ]; <span class="keyword">then</span> </span><br><span class="line">                <span class="built_in">echo</span> <span class="string">"ALREADY STARTED"</span></span><br><span class="line">                <span class="built_in">return</span> 1</span><br><span class="line">        <span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># start supervisord with options from sysconfig (stuff like -c)</span></span><br><span class="line">        <span class="variable">$SUPERVISORD</span> <span class="variable">$OPTIONS</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment"># show initial startup status</span></span><br><span class="line">        <span class="variable">$SUPERVISORCTL</span> <span class="variable">$OPTIONS</span> status</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># only create the subsyslock if we created the PIDFILE</span></span><br><span class="line">        [ -e <span class="variable">$PIDFILE</span> ] &amp;&amp; touch <span class="variable">$LOCKFILE</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="title">stop</span></span>() &#123;</span><br><span class="line">        <span class="built_in">echo</span> -n <span class="string">"Stopping supervisord: "</span></span><br><span class="line">        <span class="variable">$SUPERVISORCTL</span> <span class="variable">$OPTIONS</span> shutdown</span><br><span class="line">        <span class="keyword">if</span> [ -n <span class="string">"<span class="variable">$WAIT_FOR_SUBPROCESSES</span>"</span> ]; <span class="keyword">then</span> </span><br><span class="line">            <span class="built_in">echo</span> <span class="string">"Waiting roughly 60 seconds for <span class="variable">$PIDFILE</span> to be removed after child processes exit"</span></span><br><span class="line">            <span class="keyword">for</span> sleep <span class="keyword">in</span>  2 2 2 2 4 4 4 4 8 8 8 8 last; <span class="keyword">do</span></span><br><span class="line">                <span class="keyword">if</span> [ ! -e <span class="variable">$PIDFILE</span> ] ; <span class="keyword">then</span></span><br><span class="line">                    <span class="built_in">echo</span> <span class="string">"Supervisord exited as expected in under <span class="variable">$total_sleep</span> seconds"</span></span><br><span class="line">                    <span class="built_in">break</span></span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                    <span class="keyword">if</span> [[ <span class="variable">$sleep</span> -eq <span class="string">"last"</span> ]] ; <span class="keyword">then</span></span><br><span class="line">                        <span class="built_in">echo</span> <span class="string">"Supervisord still working on shutting down. We've waited roughly 60 seconds, we'll let it do its thing from here"</span></span><br><span class="line">                        <span class="built_in">return</span> 1</span><br><span class="line">                    <span class="keyword">else</span></span><br><span class="line">                        sleep <span class="variable">$sleep</span></span><br><span class="line">                        total_sleep=$(( <span class="variable">$total_sleep</span> + <span class="variable">$sleep</span> ))</span><br><span class="line">                    <span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line">                <span class="keyword">fi</span></span><br><span class="line">            <span class="keyword">done</span></span><br><span class="line">        <span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># always remove the subsys. We might have waited a while, but just remove it at this point.</span></span><br><span class="line">        rm -f <span class="variable">$LOCKFILE</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="title">restart</span></span>() &#123;</span><br><span class="line">        stop</span><br><span class="line">        start</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">case</span> <span class="string">"<span class="variable">$1</span>"</span> <span class="keyword">in</span></span><br><span class="line">    start)</span><br><span class="line">        start</span><br><span class="line">        RETVAL=$?</span><br><span class="line">        ;;</span><br><span class="line">    stop)</span><br><span class="line">        stop</span><br><span class="line">        RETVAL=$?</span><br><span class="line">        ;;</span><br><span class="line">    restart|force-reload)</span><br><span class="line">        restart</span><br><span class="line">        RETVAL=$?</span><br><span class="line">        ;;</span><br><span class="line">    reload)</span><br><span class="line">        <span class="variable">$SUPERVISORCTL</span> <span class="variable">$OPTIONS</span> reload</span><br><span class="line">        RETVAL=$?</span><br><span class="line">        ;;</span><br><span class="line">    condrestart)</span><br><span class="line">        [ -f <span class="variable">$LOCKFILE</span> ] &amp;&amp; restart</span><br><span class="line">        RETVAL=$?</span><br><span class="line">        ;;</span><br><span class="line">    status)</span><br><span class="line">        <span class="variable">$SUPERVISORCTL</span> <span class="variable">$OPTIONS</span> status</span><br><span class="line">        <span class="keyword">if</span> running ; <span class="keyword">then</span></span><br><span class="line">            RETVAL=0</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            RETVAL=1</span><br><span class="line">        <span class="keyword">fi</span></span><br><span class="line">        ;;</span><br><span class="line">    *)</span><br><span class="line">        <span class="built_in">echo</span> $<span class="string">"Usage: <span class="variable">$0</span> &#123;start|stop|status|restart|reload|force-reload|condrestart&#125;"</span></span><br><span class="line">        <span class="built_in">exit</span> 1</span><br><span class="line"><span class="keyword">esac</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">exit</span> <span class="variable">$RETVAL</span></span><br></pre></td></tr></table></figure>
+<p>注意修改上面脚本中 <code>supervisor</code> 配置文件路径（包括 <code>PIDFILE</code> 文件）为你的 <code>supervisor</code> 的配置文件里的相关路径。</p>
+<p>然后，修改文件权限为 <code>755</code>，并设置开机启动。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">chmod 755 /etc/init.d/supervisor</span><br><span class="line">chkconfig supervisor on</span><br></pre></td></tr></table></figure>
+<p>后续，你就可以使用下面命令来管理 <code>supervisor</code> 了。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">service supervisor <span class="built_in">help</span></span><br><span class="line">service supervisor &#123;start|stop|status|restart|reload|force-reload|condrestart&#125;</span><br></pre></td></tr></table></figure>
+<p>更多其它 <code>Linux</code> 发行版开机启动脚本：<a href="https://github.com/Supervisor/initscripts" target="_blank" rel="noopener">https://github.com/Supervisor/initscripts</a> 。</p>
+<h3 id="安装与配置Laravel"><a href="#安装与配置Laravel" class="headerlink" title="安装与配置Laravel"></a>安装与配置Laravel</h3><p><code>Laravel</code> 安装与使用，这里不做过多赘述，参考社区<a href="https://laravel-china.org/docs/laravel/5.6" target="_blank" rel="noopener">中文文档</a>。</p>
+<p><code>Laravel</code> 启用 <code>beanstalkd</code> 队列支持，需要依赖 <code>pda/pheanstalk ~3.0</code> 扩展包，请在 <code>composer.json</code> 追加上，然后 <code>composer update</code> 一下。修改 <code>.env</code> 文件，将 <code>QUEUE_DRIVER=sync</code> 由默认的同步 <code>sync</code> 改为 <code>beanstalkd</code> 。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">QUEUE_DRIVER=beanstalkd</span><br></pre></td></tr></table></figure>
+<p>现在，你可以编写 <code>supervisor</code> 管理队列服务的脚本了。这里演示了一个名叫 <code>laravel-worker</code> 的 <code>supervisor</code> 进程管理的脚本示例，文件路径为 <code>/etc/supervisor/conf.d/laravel-worker.conf</code> 。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[program:laravel-worker]                                                                                                                                      </span><br><span class="line">process_name=%(program_name)s_%(process_num)02d                                                                                                               </span><br><span class="line">command=/usr/local/php/bin/php /data/wwwroot/laravel/artisan queue:work beanstalkd --sleep=3 --tries=3 --daemon                                          </span><br><span class="line">autostart=true                                                                                                                                                </span><br><span class="line">autorestart=true                                                                                                                                              </span><br><span class="line">user=root                                                                                                                                                     </span><br><span class="line">numprocs=8                                                                                                                                                    </span><br><span class="line">redirect_stderr=true                                                                                                                                          </span><br><span class="line">stdout_logfile=/data/wwwroot/laravel/storage/logs/laravel-worker.log</span><br></pre></td></tr></table></figure>
+<p>其中 <code>/usr/local/php/bin/php</code> 为服务器中 <code>php</code> 二进制文件的绝对路径，<code>/data/wwwroot/laravel/</code> 为 <code>Laravel</code> 网站项目的路径，<code>artisan queue:work beanstalkd --sleep=3 --tries=3 --queue=default --daemon</code> 为队列处理器命令参数，它支持传入更多参数，请执行 <code>php artisan queue:work --help</code> 获取。以上参数请根据实际情况修改。</p>
+<p>配置完上面，就可以使用 <code>supervisorctl</code> 来启用与重启 <code>laravel-worker</code> 了：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">supervisorctl reread</span><br><span class="line">supervisorctl update</span><br><span class="line">supervisorctl start laravel-worker:*</span><br><span class="line">supervisorctl restart laravel-worker:*</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>  为了实现队列平滑重启，建议手动运行 <code>php artisan queue:restart</code> 命令之后，再重启 <code>laravel-worker</code> 。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">php artisan queue:restart </span><br><span class="line">supervisorctl restart laravel-worker:*</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>坚持原创分享，您的支持将鼓励我继续创作！</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatpay.jpg" alt="aoboya 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="aoboya 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/beanstalkd/" rel="tag"># beanstalkd</a>
+          
+            <a href="/tags/laravel/" rel="tag"># laravel</a>
+          
+            <a href="/tags/supervisord/" rel="tag"># supervisord</a>
+          
+            <a href="/tags/queue/" rel="tag"># queue</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/05/13/identity-card-validation-in-rust/" rel="next" title="身份证校验及其属地查询Rust版">
+                <i class="fa fa-chevron-left"></i> 身份证校验及其属地查询Rust版
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.png"
+                alt="aoboya" />
+            
+              <p class="site-author-name" itemprop="name">aoboya</p>
+              <p class="site-description motion-element" itemprop="description">读书笔记，范围从深奥数理到博大文史再到雅美艺术。</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">4</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">4</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">9</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/aoboya" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装与配置beanstalkd"><span class="nav-number">1.</span> <span class="nav-text">安装与配置beanstalkd</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#安装"><span class="nav-number">1.1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#启动脚本"><span class="nav-number">1.2.</span> <span class="nav-text">启动脚本</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装beanstalkd-console"><span class="nav-number">2.</span> <span class="nav-text">安装beanstalkd console</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装与配置supervisord"><span class="nav-number">3.</span> <span class="nav-text">安装与配置supervisord</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#安装与基本配置"><span class="nav-number">3.1.</span> <span class="nav-text">安装与基本配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#启动与服务脚本"><span class="nav-number">3.2.</span> <span class="nav-text">启动与服务脚本</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装与配置Laravel"><span class="nav-number">4.</span> <span class="nav-text">安装与配置Laravel</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate"> 
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">AoBoYa</span>  |  <span class="icp" itemprop="icpHolder"><a href="http://www.miibeian.gov.cn/">沪ICP备16042880号-1</a></span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Gemini</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.1.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+  
+  <script src="/lib/pangu/dist/pangu.min.js?v=3.3"></script>
+  <script type="text/javascript">pangu.spacingPage();</script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
